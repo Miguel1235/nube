@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 const createId = require('hash-generator')
-const { createTable, createIndex } = require('./tableCreation')
+
+const { createTable, createIndex} = require('./tableCreation')
 
 const handler = async ({ pathParameters, httpMethod, body }) => {
 
@@ -13,6 +14,7 @@ const handler = async ({ pathParameters, httpMethod, body }) => {
             secretAccessKey: '2345'
         }
     });
+
     const docClient = new AWS.DynamoDB.DocumentClient({
         apiVersion: '2012-08-10',
         service: dynamodb
@@ -20,22 +22,48 @@ const handler = async ({ pathParameters, httpMethod, body }) => {
 
     const { TableNames: tablas } = await dynamodb.listTables().promise()
     if (!tablas.includes('Envio')) {
-        createTable(dynamodb)
-        createIndex(dynamodb)
+        await createTable(dynamodb)
+        await createIndex(dynamodb)
     }
 
     switch (httpMethod) {
         case 'GET':
+            const idEnvioFind = (pathParameters || {}).idEnvio || false;
+            if (idEnvioFind) {
+                const findEnvioParams = {
+                    TableName: 'Envio',
+                    Key: {
+                        id: idEnvioFind,
+                    }
+                };
+
+                const envio = await docClient.get(findEnvioParams).promise()
+                return {
+                    statusCode: 200,
+                    headers: {"content-type": "application/json"},
+                    body: JSON.stringify(envio)
+                }
+            }
+
             const findParams = {
                 TableName: 'Envio',
-                IndexName: "EnviosPendientesIndex"
+                IndexName: 'EnviosPendientesIndex'
             };
 
             try {
                 const envios = await docClient.scan(findParams).promise()
-                return { body: JSON.stringify(envios) }
-            } catch {
-                return { statusCode: 500, headers: { "content-type": "text/plain" }, body: 'No se pudo obtener los envíos' };
+                return {
+                    statusCode: 200,
+                    headers: {"content-type": "application/json"},
+                    body: JSON.stringify(envios)
+                }
+            } catch (err) {
+                console.log(err)
+                return {
+                    statusCode: 500,
+                    headers: {"content-type": "text/plain"},
+                    body: 'No se pudo obtener los envíos'
+                };
             }
 
         case 'POST':
@@ -51,9 +79,17 @@ const handler = async ({ pathParameters, httpMethod, body }) => {
 
             try {
                 await docClient.put(createParams).promise()
-                return { body: JSON.stringify(createParams.Item) };
+                return {
+                    statusCode: 200,
+                    headers: {"content-type": "application/json"},
+                    body: JSON.stringify(createParams.Item)
+                };
             } catch {
-                return { statusCode: 500, headers: { "content-type": "text/plain" }, body: 'No se pudo crear el envío' };
+                return {
+                    statusCode: 500,
+                    headers: {"content-type": "text/plain"},
+                    body: 'No se pudo crear el envío'
+                };
             }
 
         case 'PUT':
@@ -70,13 +106,25 @@ const handler = async ({ pathParameters, httpMethod, body }) => {
 
             try {
                 await docClient.update(updateParams).promise()
-                return { statusCode: 200, headers: { "content-type": "text/plain" }, body: `El envío con el id ${idEnvio} fue entregado correctamente` };
+                return {
+                    statusCode: 200,
+                    headers: {"content-type": "text/plain"},
+                    body: `El envío con el id ${idEnvio} fue entregado correctamente`
+                };
             } catch {
-                return { statusCode: 500, headers: { "content-type": "text/plain" }, body: `No se pudo entregar el envío ${idEnvio}` };
+                return {
+                    statusCode: 500,
+                    headers: {"content-type": "text/plain"},
+                    body: `No se pudo entregar el envío ${idEnvio}`
+                };
             }
 
         default:
-            return { statusCode: 501, headers: { "content-type": "text/plain" }, body: `Método ${httpMethod} no soportado` };
+            return {
+                statusCode: 501,
+                headers: {"content-type": "text/plain"},
+                body: `Método ${httpMethod} no soportado`
+            };
     }
 }
 

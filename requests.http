@@ -11,3 +11,6 @@ Content-Type: application/json
 
 ###
 PUT http://localhost:3000/envios/kdfxq6h5/entregado
+
+###
+GET http://localhost:3000/envio/kdfxq6h5

@@ -1,5 +1,5 @@
-const createTable = (dynamodb) => {
-    let params = {
+const createTable = async (dynamodb) => {
+    const params = {
         TableName: 'Envio',
         KeySchema: [
             {
@@ -19,14 +19,16 @@ const createTable = (dynamodb) => {
         }
     };
 
-    dynamodb.createTable(params, (err, data) => {
-        if (err) console.log(err)
-        else console.log(data)
-    });
+    try{
+        return await dynamodb.createTable(params).promise()
+    }
+    catch (error) {
+        console.log(error)
+    }
 }
 
-const createIndex = (dynamodb) => {
-    let params = {
+const createIndex = async (dynamodb) => {
+    const params = {
         TableName: 'Envio',
         AttributeDefinitions: [
             {
@@ -62,10 +64,13 @@ const createIndex = (dynamodb) => {
         },
         ],
     };
-    dynamodb.updateTable(params, (err, data) => {
-        if (err) console.log(err)
-        else console.log(data)
-    })
+
+    try{
+        return await dynamodb.updateTable(params).promise()
+    }
+    catch (error) {
+        console.log(error)
+    }
 }
 
 module.exports = {

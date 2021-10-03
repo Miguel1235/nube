@@ -14,6 +14,11 @@ Resources:
           Properties:
             Path: /envios/{idEnvio}/entregado
             Method: put
+        OneEnvio:
+          Type: Api
+          Properties:
+            Path: /envio/{idEnvio}
+            Method: get
         PendingEnvios:
           Type: Api
           Properties:

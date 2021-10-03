@@ -11,7 +11,7 @@
 npm i
 docker container rm dynamodb
 docker network create awslocal
-docker run -p 8000:8000 --network awslocal --name dynamodb amazon/dynamodb-local -jar DynamoDBLocal.jar -sharedDb
+docker run --rm -p 8000:8000 --network awslocal --name dynamodb amazon/dynamodb-local -jar DynamoDBLocal.jar -sharedDb
 sam local start-api --docker-network awslocal
 ```
 
@@ -70,7 +70,6 @@ GET http://localhost:3000/envios/pendientes
 }
 ```
 
-
 ### :incoming_envelope: Entregar un pedido
 
 ```http request
@@ -81,4 +80,23 @@ PUT http://localhost:3000/envios/kdfxq6h5/entregado
 
 ```text
 El envío con el id kdfxq6h5 fue entregado correctamente
+```
+
+### :email: Obtener un envío en particular
+
+```http request
+GET http://localhost:3000/envio/kdfxq6h5
+```
+
+#### Respuesta
+
+```json
+{
+  "Item": {
+    "destino": "MDZ",
+    "id": "kdfxq6h5",
+    "fechaAlta": "2021-10-03T03:39:13.888Z",
+    "email": "migueldelcorso@gmail.com"
+  }
+}
 ```
