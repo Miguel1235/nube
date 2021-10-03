@@ -1,0 +1,12 @@
+GET http://localhost:3000/envios/pendientes
+
+###
+POST http://localhost:3000/envios
+
+{
+    "destino": "MISIONES",
+    "email": "misiones@gmail.com"
+}
+
+###
+PUT http://localhost:3000/envios/w81trqe0/entregado
