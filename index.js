@@ -51,7 +51,7 @@ const handler = async ({pathParameters, httpMethod, body}) => {
 
             try {
                 await docClient.put(createParams).promise()
-                return {body: 'Envío creado correctamente'};
+                return {body: JSON.stringify(createParams.Item)};
             } catch {
                 return {statusCode: 500, body: 'No se pudo crear el envío'};
             }
