@@ -1,8 +1,6 @@
 const AWS = require('aws-sdk');
 const createId = require('hash-generator')
 
-const { createTable, createIndex} = require('./tableCreation')
-
 const handler = async ({ pathParameters, httpMethod, body }) => {
 
     const dynamodb = new AWS.DynamoDB({
@@ -22,8 +20,11 @@ const handler = async ({ pathParameters, httpMethod, body }) => {
 
     const { TableNames: tablas } = await dynamodb.listTables().promise()
     if (!tablas.includes('Envio')) {
-        await createTable(dynamodb)
-        await createIndex(dynamodb)
+        return {
+            statusCode: 400,
+            headers: { "content-type": "text/json" },
+            body: 'Por favor crea las tablas que estan en el archivo tableCreation.js'
+        }
     }
 
     switch (httpMethod) {
@@ -40,7 +41,7 @@ const handler = async ({ pathParameters, httpMethod, body }) => {
                 const envio = await docClient.get(findEnvioParams).promise()
                 return {
                     statusCode: 200,
-                    headers: {"content-type": "application/json"},
+                    headers: { "content-type": "application/json" },
                     body: JSON.stringify(envio)
                 }
             }
@@ -54,14 +55,14 @@ const handler = async ({ pathParameters, httpMethod, body }) => {
                 const envios = await docClient.scan(findParams).promise()
                 return {
                     statusCode: 200,
-                    headers: {"content-type": "application/json"},
+                    headers: { "content-type": "application/json" },
                     body: JSON.stringify(envios)
                 }
             } catch (err) {
                 console.log(err)
                 return {
                     statusCode: 500,
-                    headers: {"content-type": "text/plain"},
+                    headers: { "content-type": "text/plain" },
                     body: 'No se pudo obtener los envíos'
                 };
             }
@@ -81,13 +82,13 @@ const handler = async ({ pathParameters, httpMethod, body }) => {
                 await docClient.put(createParams).promise()
                 return {
                     statusCode: 200,
-                    headers: {"content-type": "application/json"},
+                    headers: { "content-type": "application/json" },
                     body: JSON.stringify(createParams.Item)
                 };
             } catch {
                 return {
                     statusCode: 500,
-                    headers: {"content-type": "text/plain"},
+                    headers: { "content-type": "text/plain" },
                     body: 'No se pudo crear el envío'
                 };
             }
@@ -108,13 +109,13 @@ const handler = async ({ pathParameters, httpMethod, body }) => {
                 await docClient.update(updateParams).promise()
                 return {
                     statusCode: 200,
-                    headers: {"content-type": "text/plain"},
+                    headers: { "content-type": "text/plain" },
                     body: `El envío con el id ${idEnvio} fue entregado correctamente`
                 };
             } catch {
                 return {
                     statusCode: 500,
-                    headers: {"content-type": "text/plain"},
+                    headers: { "content-type": "text/plain" },
                     body: `No se pudo entregar el envío ${idEnvio}`
                 };
             }
@@ -122,7 +123,7 @@ const handler = async ({ pathParameters, httpMethod, body }) => {
         default:
             return {
                 statusCode: 501,
-                headers: {"content-type": "text/plain"},
+                headers: { "content-type": "text/plain" },
                 body: `Método ${httpMethod} no soportado`
             };
     }

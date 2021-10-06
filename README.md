@@ -7,6 +7,8 @@
 
 ## :crystal_ball: Instalación
 
+### Correr proyecto
+
 ```bash
 npm i
 docker container rm dynamodb
@@ -15,9 +17,14 @@ docker run --rm -p 8000:8000 --network awslocal --name dynamodb amazon/dynamodb-
 sam local start-api --docker-network awslocal
 ```
 
+### Crear tablas e indices
+Abrir `http://localhost:8000/shell/` y copiar el contenido de tableCreation.js
+
 ## :pushpin: [EndPoints](requests.http)
 
 ### :package: Crear un envío
+
+> El usuario desea crear un envio, especificando el destino y el email
 
 ```http request
 POST http://localhost:3000/envios
@@ -42,6 +49,8 @@ Content-Type: application/json
 ```
 
 ### :mailbox_closed: Obtener envíos pendientes
+
+> El usuario desea obtener los envios que se encuentran pendientes, en caso de necesitar mas informacion sobre un envio particular puede utilizar el endPoint de obtener envio
 
 ```http request
 GET http://localhost:3000/envios/pendientes
@@ -72,6 +81,8 @@ GET http://localhost:3000/envios/pendientes
 
 ### :incoming_envelope: Entregar un pedido
 
+> El usuario desea eliminar el atributo pendiente de un envio en particular, entregado de esta forma el pedido
+
 ```http request
 PUT http://localhost:3000/envios/kdfxq6h5/entregado
 ```
@@ -83,6 +94,8 @@ El envío con el id kdfxq6h5 fue entregado correctamente
 ```
 
 ### :email: Obtener un envío en particular
+
+> El usuario desea obtener mas informacion acerca de un envio en particular, se encuentre pendiente o no
 
 ```http request
 GET http://localhost:3000/envio/kdfxq6h5
